@@ -8,10 +8,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import javax.persistence.Temporal;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,12 +50,14 @@ public class ProductRepositoryTest {
         entityManager.flush();
 
         //when
+        category.setHasLength(true);
         product.setNumberOfViews(product.getNumberOfViews() + 1);
         productRepository.save(product);
 
         //then
         Product saved = entityManager.find(Product.class, product.getId());
         assertEquals(saved.getNumberOfViews(), product.getNumberOfViews());
+        assertEquals(true, saved.getType().hasLength());
     }
 
     @Test
@@ -106,16 +106,16 @@ public class ProductRepositoryTest {
         Product product3 = null;
         List<Product> products = null;
         try {
-            product1 = new Product("Product 1", "pr1", category, df.parse("2020,03,02"), 1 );
-            product2 = new Product("Product 2", "pr2", category, df.parse("2020,03,02"), 1 );
-            product3 = new Product("Product 3", "pr3", category, df.parse("2019,02,01"), 1 );
+            product1 = new Product("Product 1", "pr1", category, df.parse("2020-03-02"), 1 );
+            product2 = new Product("Product 2", "pr2", category, df.parse("2020-03-02"), 1 );
+            product3 = new Product("Product 3", "pr3", category, df.parse("2019-02-01"), 1 );
             entityManager.persist(product1);
             entityManager.persist(product2);
             entityManager.persist(product3);
             entityManager.flush();
 
             //when
-            Date query = df.parse("2020,03,02");
+            Date query = df.parse("2020-03-02");
             products = productRepository.findByReleaseDate(query);
 
             //then
@@ -124,9 +124,12 @@ public class ProductRepositoryTest {
             assertThat(products.stream().map(Product::getReleaseDate).allMatch(date -> date.equals(query)));
         } catch (ParseException e) {
             e.printStackTrace();
+            assertThat(products).isNotNull();
         }
+
     }
 
+    @Test
     public void testFindByOrderByNumberOfViews(){
         //given
         Category category = new Category("Trailer TV", false);
@@ -137,11 +140,65 @@ public class ProductRepositoryTest {
         entityManager.flush();
 
         //when
-        Sort.Direction direction = Sort.Direction.ASC;
-        List<Product> products = productRepository.findByOrderByNumberOfViewsDesc();
+        Direction direction = Direction.DESC;
+        List<Product> products;
+        if (direction == Direction.ASC){
+            products = productRepository.findByOrderByNumberOfViewsAsc();
+        }
+        else{
+            products = productRepository.findByOrderByNumberOfViewsDesc();
+        }
 
         //then
-        assertThat(products).containsExactly(product1, product2);
+        assertThat(products).isNotEmpty();
+        if(direction == Direction.ASC) {
+            assertThat(products).containsSequence(product1, product2);
+        }
+        else {
+            assertThat(products).containsSequence(product2, product1);
+        }
+    }
+
+    @Test
+    public void testFindByOrderByReleaseDate(){
+        //given
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Category category = new Category("Trailer TV", false);
+        Product product1 = null;
+        Product product2 = null;
+        List<Product> products = null;
+        try {
+            product1 = new Product("Product 1", "pr1", category, df.parse("2020-03-02"), 1 );
+            product2 = new Product("Product 2", "pr2", category, df.parse("2019-03-02"), 1 );
+            entityManager.persist(product1);
+            entityManager.persist(product2);
+            entityManager.flush();
+
+            //when
+            Direction direction = Direction.DESC;
+            if (direction == Direction.ASC){
+                products = productRepository.findByOrderByReleaseDateAsc();
+            }
+            else{
+                products = productRepository.findByOrderByReleaseDateDesc();
+            }
+
+            //then
+            assertThat(products).isNotEmpty();
+            if(direction == Direction.ASC) {
+                assertThat(products).containsSequence(product2, product1);
+            }
+            else {
+                assertThat(products).containsSequence(product1, product2);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            assertThat(products).isNotNull();
+        }
+
+
+
     }
 
 }
