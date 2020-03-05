@@ -7,14 +7,14 @@ import com.example.demo.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringTokenizer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class ProductService {
+    static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
     private ProductRepository productRepository;
@@ -26,13 +26,14 @@ public class ProductService {
         if (product.getAbbreviation() == null || product.getAbbreviation().isEmpty()){
             product.setAbbreviation(generateAbbreviation(product.getName()));
         }
+        String format = "00:00:00";
         if (product.getType().hasLength()){
             int hours = (int) (seconds / 3600);
             int minutes = (int)((seconds - hours*3600) / 60);
             int sec = (int)(seconds - hours*3600 - minutes *60);
-            String format = String.format("%02d:%02d:%02d", hours, minutes, sec);
-            product.setFormat(format);
+            format = String.format("%02d:%02d:%02d", hours, minutes, sec);
         }
+        product.setFormat(format);
         //Check category
         Optional<Category> optCategory = categoryRepository.findById(product.getType().getName());
         if(optCategory.isPresent()){
@@ -57,6 +58,10 @@ public class ProductService {
                     return productRepository.save(product);
                 });
 
+    }
+
+    public List<Product> getProductByNumberOfViews(int number){
+        return productRepository.findByNumberOfViews(number);
     }
 
     private String generateAbbreviation(String name){
@@ -99,4 +104,29 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public List<Product> findByReleaseDate(String date) throws ParseException {
+        return productRepository.findByReleaseDate(dateFormatter.parse(date));
+    }
+
+    public List<Product> findByNumberOfViews(int number){
+        return productRepository.findByNumberOfViews(number);
+    }
+
+    public List<Product> getProductsByOrderByNumberOfViews(String direction) throws Exception {
+        if (direction.toUpperCase().equals("ASC")){
+            return productRepository.findByOrderByNumberOfViewsAsc();
+        }else if(direction.toUpperCase().equals("DESC")){
+            return productRepository.findByOrderByNumberOfViewsDesc();
+        }
+        throw new Exception("Unknown direction: " + direction);
+    }
+
+    public List<Product> getProductsByOrderByReleaseDate(String direction) throws Exception {
+        if (direction.toUpperCase().equals("ASC")){
+            return productRepository.findByOrderByReleaseDateAsc();
+        }else if(direction.toUpperCase().equals("DESC")){
+            return productRepository.findByOrderByReleaseDateDesc();
+        }
+        throw new Exception("Unknown direction: " + direction);
+    }
 }

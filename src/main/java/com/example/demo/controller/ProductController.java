@@ -5,9 +5,10 @@ import com.example.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
-@RequestMapping("api/product")
+//@RequestMapping("api/product")
 @RestController
 public class ProductController {
     private final ProductService productService;
@@ -17,29 +18,49 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping
+    @PostMapping("/products")
     public Product addProduct(@RequestBody Product product, @RequestParam(name = "length", defaultValue = "0") long length){
         return productService.addProduct(product, length);
     }
 
-    @DeleteMapping(path = "{id}")
+    @DeleteMapping(path = "/products/{id}")
     public void deleteProduct(@PathVariable("id") long id){
         productService.deleteProductById(id);
     }
 
-    @PutMapping(path = "{id}")
+    @PutMapping(path = "/products/{id}")
     public Product updateProduct(@PathVariable("id") long id, @RequestBody Product product){
         return productService.updateProduct(id, product).orElse( null);
     }
 
-    @GetMapping(path = "{id}")
+    @GetMapping("products/{id}")
     public Product getProductById(@PathVariable("id") long id){
         return productService.getProductById(id).orElse(null);
     }
 
-    @GetMapping
+    @GetMapping("/products")
     public Iterable<Product> getAllProduct(){
         return productService.getAllProduct();
+    }
+
+    @GetMapping("/products/byNumberOfViews")
+    public List<Product> getProductsByOrderByNumberOfViews(@RequestParam(name = "direction", defaultValue = "ASC") String direction) throws Exception {
+        return productService.getProductsByOrderByNumberOfViews(direction);
+    }
+
+    @GetMapping("/products/findByNumberOfViews/{number}")
+    public List<Product> getProductsByNumberOfViews(@PathVariable(name = "number") int number)  {
+        return productService.findByNumberOfViews(number);
+    }
+
+    @GetMapping("/products/byReleaseDate")
+    public List<Product> getProductsByOrderByReleaseDate(@RequestParam(name = "direction", defaultValue = "ASC") String direction) throws Exception {
+        return productService.getProductsByOrderByReleaseDate(direction);
+    }
+
+    @GetMapping("/products/findByReleaseDate/{date}")
+    public List<Product> getProductsByNumberOfViews(@PathVariable(name = "date") String date) throws ParseException {
+        return productService.findByReleaseDate(date);
     }
 
 }

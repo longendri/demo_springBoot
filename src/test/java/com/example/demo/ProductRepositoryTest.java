@@ -39,6 +39,7 @@ public class ProductRepositoryTest {
 
         //then
         assertNotNull(saved.getId());
+        assertNotNull(saved.getInsertDate());
     }
 
     @Test
@@ -64,15 +65,17 @@ public class ProductRepositoryTest {
     public void testDeleteProduct(){
         //given
         Category category = new Category("Trailer TV", false);
-        Product product = new Product("Product 1", "pr1", category, new Date(), 3 );
-        product = entityManager.persist(product);
+        Product product1 = new Product("Product 1", "pr1", category, new Date(), 3 );
+        Product product2 = new Product("Product 2", "pr2", category, new Date(), 5 );
+        product1 = entityManager.persist(product1);
+        product2 = entityManager.persist(product2);
         entityManager.flush();
 
         //when
-        productRepository.delete(product);
+        productRepository.delete(product2);
 
         //then
-        assertThat(entityManager.find(Product.class, product.getId())).isNull();
+        assertThat(entityManager.find(Product.class, product2.getId())).isNull();
     }
 
 

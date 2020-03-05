@@ -4,49 +4,62 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @Entity
 public class Product {
-    private static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonProperty("name")
     private String name;
+
     @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name="categoryName")
     @JsonProperty("type")
     private Category type;
+
     @JsonProperty("releaseDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private Date releaseDate;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-    private Date insertDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private final Date insertDate;
+
     @JsonProperty(value = "abbreviation", required = false)
     private String abbreviation;
+
     @JsonProperty("numberOfViews")
     private int numberOfViews;
+
     private String format;
 
-    protected  Product(){}
+    protected  Product(){
+        insertDate = new Date();
+    }
 
     public Product(String name, String abbreviation, Category type, Date releaseDate, int numberOfViews) {
         this.name = name;
         this.abbreviation = abbreviation;
         this.type = type;
         this.releaseDate = releaseDate;
-        this.insertDate = new Date();
         this.numberOfViews = numberOfViews;
+        insertDate = new Date();
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
