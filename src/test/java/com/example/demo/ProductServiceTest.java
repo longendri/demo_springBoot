@@ -48,9 +48,15 @@ public class ProductServiceTest {
         Mockito.when(categoryRepository.findById(category.getName())).thenReturn(Optional.of(category));
         Mockito.when(productRepository.save(product)).thenReturn(product);
 
-        Product saved = productServ.addProduct(product, 3600);
+        Product saved = null;
+        try {
+            saved = productServ.addProduct(product, 3600);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //Then
+        assertThat(saved).isNotNull();
         assertEquals("FFA", saved.getAbbreviation());
         assertEquals("01:00:00", saved.getFormat());
     }

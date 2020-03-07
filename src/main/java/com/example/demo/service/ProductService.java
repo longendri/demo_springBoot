@@ -21,12 +21,14 @@ public class ProductService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public Product addProduct(Product product, long seconds){
+    public Product addProduct(Product product, long seconds) throws Exception {
         if (product.getAbbreviation() == null || product.getAbbreviation().isEmpty()){
             product.setAbbreviation(generateAbbreviation(product.getName()));
         }
         String format = "00:00:00";
         if (product.getType().hasLength()){
+            if (seconds <=0)
+                throw new Exception("The lenght paramter is invalid");
             int hours = (int) (seconds / 3600);
             int minutes = (int)((seconds - hours*3600) / 60);
             int sec = (int)(seconds - hours*3600 - minutes *60);

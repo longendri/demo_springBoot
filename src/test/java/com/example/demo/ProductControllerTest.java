@@ -56,7 +56,7 @@ public class ProductControllerTest {
     @Test
     public void testAddProduct() throws Exception {
         //given
-        Category category = new Category("Trailer TV", false);
+        Category category = new Category("Trailer TV", true);
         Product product1 = new Product("Product 1", "pr1", category, new Date(), 3 );
 
         //when

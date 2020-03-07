@@ -19,7 +19,7 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public Product addProduct(@RequestBody Product product, @RequestParam(name = "length", defaultValue = "0") long length){
+    public Product addProduct(@RequestBody Product product, @RequestParam(name = "length", defaultValue = "0") long length) throws Exception {
         return productService.addProduct(product, length);
     }
 
