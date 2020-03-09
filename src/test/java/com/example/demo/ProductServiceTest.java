@@ -50,7 +50,7 @@ public class ProductServiceTest {
 
         Product saved = null;
         try {
-            saved = productServ.addProduct(product, 3600);
+            saved = productServ.addProduct(category.getName(), product, 3600);
         } catch (Exception e) {
             e.printStackTrace();
         }

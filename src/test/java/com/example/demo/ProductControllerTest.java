@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.example.demo.controller.ProductController;
 import com.example.demo.model.Category;
 import com.example.demo.model.Product;
+import com.example.demo.service.CategoryService;
 import com.example.demo.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,11 @@ public class ProductControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ProductService service;
+    private CategoryService categoryService;
+
+    @MockBean
+    private ProductService productService;
+
 
     @Test
     public void testGetAllProducts() throws Exception {
@@ -43,7 +48,7 @@ public class ProductControllerTest {
 
         List<Product> products = Arrays.asList(product1, product2);
         //when
-        when(service.getAllProduct()).thenReturn(products);
+        when(productService.getAllProduct()).thenReturn(products);
 
         //then
         mockMvc.perform(get("/products"))
@@ -60,16 +65,19 @@ public class ProductControllerTest {
         Product product1 = new Product("Product 1", "pr1", category, new Date(), 3 );
 
         //when
-        when(service.addProduct(product1, 0)).thenReturn(product1);
+        when(categoryService.findById(category.getName())).thenReturn(Optional.of(category));
+        when(productService.addProduct(category.getName(), product1, 0)).thenReturn(product1);
 
         //then
         ObjectMapper objectMapper = new ObjectMapper();
+
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/products")
+                .param("type", "Trailer TV")
+                .param("length", "3600")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(product1)))
                 .andExpect(status().isOk());
-
     }
 
     @Test
@@ -80,7 +88,7 @@ public class ProductControllerTest {
         product1.setId((long)1);
 
         //when
-        when(service.updateProduct(product1.getId(), product1)).thenReturn(Optional.of(product1));
+        when(productService.updateProduct(product1.getId(), product1)).thenReturn(Optional.of(product1));
 
         //then
         ObjectMapper objectMapper = new ObjectMapper();

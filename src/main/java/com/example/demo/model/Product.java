@@ -16,7 +16,7 @@ public class Product {
     @JsonProperty("name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="categoryName")
     @JsonProperty("type")
     private Category type;

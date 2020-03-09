@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.util.List;
 
-//@RequestMapping("api/product")
 @RestController
 public class ProductController {
     private final ProductService productService;
@@ -19,8 +18,8 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public Product addProduct(@RequestBody Product product, @RequestParam(name = "length", defaultValue = "0") long length) throws Exception {
-        return productService.addProduct(product, length);
+    public Product addProduct(@RequestParam(name = "type") String type, @RequestBody Product product, @RequestParam(name = "length", defaultValue = "0") long length) throws Exception {
+        return productService.addProduct(type, product, length);
     }
 
     @DeleteMapping(path = "/products/{id}")

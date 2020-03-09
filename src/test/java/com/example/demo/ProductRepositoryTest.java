@@ -47,18 +47,17 @@ public class ProductRepositoryTest {
         //given
         Category category = new Category("Trailer TV", false);
         Product product = new Product("Product 1", "pr1", category, new Date(), 3 );
+        entityManager.persistAndFlush(category);
         product = entityManager.persist(product);
         entityManager.flush();
 
         //when
-        category.setHasLength(true);
         product.setNumberOfViews(product.getNumberOfViews() + 1);
         productRepository.save(product);
 
         //then
         Product saved = entityManager.find(Product.class, product.getId());
         assertEquals(saved.getNumberOfViews(), product.getNumberOfViews());
-        assertEquals(true, saved.getType().hasLength());
     }
 
     @Test
@@ -67,6 +66,7 @@ public class ProductRepositoryTest {
         Category category = new Category("Trailer TV", false);
         Product product1 = new Product("Product 1", "pr1", category, new Date(), 3 );
         Product product2 = new Product("Product 2", "pr2", category, new Date(), 5 );
+        entityManager.persistAndFlush(category);
         product1 = entityManager.persist(product1);
         product2 = entityManager.persist(product2);
         entityManager.flush();
@@ -85,6 +85,7 @@ public class ProductRepositoryTest {
         Category category = new Category("Trailer TV", false);
         Product product1 = new Product("Product 1", "pr1", category, new Date(), 3 );
         Product product2 = new Product("Product 2", "pr2", category, new Date(), 5 );
+        entityManager.persistAndFlush(category);
         product1 = entityManager.persist(product1);
         product2 = entityManager.persist(product2);
         entityManager.flush();
@@ -112,6 +113,7 @@ public class ProductRepositoryTest {
             product1 = new Product("Product 1", "pr1", category, df.parse("2020-03-02"), 1 );
             product2 = new Product("Product 2", "pr2", category, df.parse("2020-03-02"), 1 );
             product3 = new Product("Product 3", "pr3", category, df.parse("2019-02-01"), 1 );
+            entityManager.persistAndFlush(category);
             entityManager.persist(product1);
             entityManager.persist(product2);
             entityManager.persist(product3);
@@ -138,6 +140,7 @@ public class ProductRepositoryTest {
         Category category = new Category("Trailer TV", false);
         Product product1 = new Product("Product 1", "pr1", category, new Date(), 3 );
         Product product2 = new Product("Product 2", "pr2", category, new Date(), 5 );
+        entityManager.persistAndFlush(category);
         product1 = entityManager.persist(product1);
         product2 = entityManager.persist(product2);
         entityManager.flush();
@@ -173,6 +176,7 @@ public class ProductRepositoryTest {
         try {
             product1 = new Product("Product 1", "pr1", category, df.parse("2020-03-02"), 1 );
             product2 = new Product("Product 2", "pr2", category, df.parse("2019-03-02"), 1 );
+            entityManager.persistAndFlush(category);
             entityManager.persist(product1);
             entityManager.persist(product2);
             entityManager.flush();

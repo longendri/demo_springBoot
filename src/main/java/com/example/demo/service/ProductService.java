@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Category;
-import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +18,24 @@ public class ProductService {
     private ProductRepository productRepository;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
-    public Product addProduct(Product product, long seconds) throws Exception {
+    public Product addProduct(String type, Product product, long seconds) throws Exception {
         if (product.getAbbreviation() == null || product.getAbbreviation().isEmpty()){
             product.setAbbreviation(generateAbbreviation(product.getName()));
         }
+
+        //Check category
+        Optional<Category> optCategory = categoryService.findById(type);
+        Category category;
+        if(optCategory.isPresent()){
+            category = optCategory.get();
+        }else{
+            throw new Exception(String.format("Category %s does not exist", type));
+        }
+        product.setType(category);
+
+        // set format
         String format = "00:00:00";
         if (product.getType().hasLength()){
             if (seconds <=0)
@@ -35,14 +46,8 @@ public class ProductService {
             format = String.format("%02d:%02d:%02d", hours, minutes, sec);
         }
         product.setFormat(format);
-        //Check category
-        Optional<Category> optCategory = categoryRepository.findById(product.getType().getName());
-        if(optCategory.isPresent()){
-            Category category = optCategory.get();
-            category.setHasLength(product.getType().hasLength());
-            product.setType(category);
-        }
-      return productRepository.save(product);
+
+        return productRepository.save(product);
     }
 
     public Optional<Product> updateProduct(long id, Product newProduct){
@@ -59,10 +64,6 @@ public class ProductService {
                     return productRepository.save(product);
                 });
 
-    }
-
-    public List<Product> getProductByNumberOfViews(int number){
-        return productRepository.findByNumberOfViews(number);
     }
 
     private String generateAbbreviation(String name){
