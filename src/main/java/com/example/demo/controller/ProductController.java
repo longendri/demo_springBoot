@@ -32,6 +32,16 @@ public class ProductController {
         return productService.updateProduct(id, product).orElse( null);
     }
 
+    @PatchMapping(path = "/products/updateNumberOfViews/{id}")
+    public void updateNumberOfViews(@PathVariable("id") long id){
+        productService.updateNumberOfViews(id);
+    }
+
+    @PatchMapping(path = "/products/resetNumberOfViews/{id}")
+    public void resetNumberOfViews(@PathVariable("id") long id){
+        productService.resetNumberOfViews(id);
+    }
+
     @GetMapping("products/{id}")
     public Product getProductById(@PathVariable("id") long id){
         return productService.getProductById(id).orElse(null);

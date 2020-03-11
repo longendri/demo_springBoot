@@ -6,6 +6,7 @@ import com.example.demo.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -58,12 +59,33 @@ public class ProductService {
                     }
                     product.setName(newProduct.getName());
                     product.setType(newProduct.getType());
-                    product.setNumberOfViews(newProduct.getNumberOfViews());
                     product.setReleaseDate(newProduct.getReleaseDate());
 
                     return productRepository.save(product);
                 });
 
+    }
+
+    public void updateNumberOfViews(long id){
+        //Option 1
+        //productRepository.updateNumberOfViews(id);
+
+        //Option 2
+        synchronized (this) {
+            productRepository.findById(id).map(product -> {
+                product.setNumberOfViews(product.getNumberOfViews() + 1);
+                return productRepository.save(product);
+            });
+        }
+    }
+
+    public void resetNumberOfViews(long id){
+        synchronized (this) {
+            productRepository.findById(id).map(product -> {
+                product.setNumberOfViews(0);
+                return productRepository.save(product);
+            });
+        }
     }
 
     private String generateAbbreviation(String name){

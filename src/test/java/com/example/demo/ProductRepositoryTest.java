@@ -5,6 +5,7 @@ import com.example.demo.model.Product;
 import com.example.demo.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -16,8 +17,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -203,9 +210,33 @@ public class ProductRepositoryTest {
             e.printStackTrace();
             assertThat(products).isNotNull();
         }
-
-
-
     }
+
+//    @Test
+//    public void testUpdateNumberOfViews() throws ExecutionException, InterruptedException {
+//        //given
+//        Category category = new Category("Trailer TV", false);
+//        Product product = new Product("Product 1", "pr1", category, new Date(), 0 );
+//        entityManager.persistAndFlush(category);
+//        product = entityManager.persistAndFlush(product);
+//        entityManager.flush();
+//
+//        //when
+//        int numberOfThreads = 10;
+//        ExecutorService executorService  = Executors.newFixedThreadPool(numberOfThreads);
+//        List<Future> futureList = new ArrayList<>(numberOfThreads);
+//        long id = product.getId();
+//        for(int thread=1; thread <= numberOfThreads; thread++){
+//            futureList.add(executorService.submit(()-> productRepository.updateNumberOfViews(id)));
+//        }
+//        for(int thread=0; thread < numberOfThreads; thread++){
+//            futureList.get(thread).get();
+//        }
+//        executorService.shutdown();
+//
+//        //then
+//        product = productRepository.findById(id).get();
+//        assertEquals(numberOfThreads, product.getNumberOfViews());
+//    }
 
 }
